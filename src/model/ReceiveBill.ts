@@ -1,77 +1,63 @@
-import BillPayCategory from './BillPayCategory';
-import Driver from './Driver';
-import Employee from './Employee';
 import FreightOrder from './FreightOrder';
 import PaymentForm from './PaymentForm';
+import Representation from './Representation';
 import SalesOrder from './SalesOrder';
 import User from './User';
 
-export default class BillPay {
+export default class ReceiveBill {
   private _id: number;
-  private _bill: number;
   private _date: Date;
-  private _type: number;
+  private _bill: number;
   private _description: string;
-  private _enterprise: string;
-  private _installment: number;
+  private _payer: string;
   private _amount: number;
   private _comission: boolean;
   private _situation: number;
   private _dueDate: Date;
-  private _paymentDate: Date;
-  private _amountPaid: number;
-  private _pendency?: BillPay;
+  private _receiveDate: Date;
+  private _amountReceived: number;
+  private _pendency?: ReceiveBill;
   private _paymentForm?: PaymentForm;
-  private _driver?: Driver;
-  private _salesman?: Employee;
-  private _category?: BillPayCategory;
-  private _freightOrder?: FreightOrder;
+  private _representation?: Representation;
   private _salesOrder?: SalesOrder;
+  private _freightOrder?: FreightOrder;
   private _author?: User;
 
   constructor(
     id = 0,
-    bill = 0,
     date = new Date(),
-    type = 0,
+    bill = 0,
     description = '',
-    enterprise = '',
-    installment = 0,
+    payer = '',
     amount = 0,
     comission = false,
     situation = 0,
     dueDate = new Date(),
-    paymentDate = new Date(),
-    amountPaid = 0,
+    receiveDate = new Date(),
+    amountReceived = 0,
     pendency = undefined,
     paymentForm = undefined,
-    driver = undefined,
-    salesman = undefined,
-    category = undefined,
-    freightOrder = undefined,
+    representation = undefined,
     salesOrder = undefined,
+    freightOrder = undefined,
     author = undefined,
   ) {
     this._id = id;
-    this._bill = bill;
     this._date = date;
-    this._type = type;
+    this._bill = bill;
     this._description = description;
-    this._enterprise = enterprise;
-    this._installment = installment;
+    this._payer = payer;
     this._amount = amount;
     this._comission = comission;
     this._situation = situation;
     this._dueDate = dueDate;
-    this._paymentDate = paymentDate;
-    this._amountPaid = amountPaid;
+    this._receiveDate = receiveDate;
+    this._amountReceived = amountReceived;
     this._pendency = pendency;
     this._paymentForm = paymentForm;
-    this._driver = driver;
-    this._salesman = salesman;
-    this._category = category;
-    this._freightOrder = freightOrder;
+    this._representation = representation;
     this._salesOrder = salesOrder;
+    this._freightOrder = freightOrder;
     this._author = author;
   }
 
@@ -87,20 +73,12 @@ export default class BillPay {
     return this._bill;
   }
 
-  get type(): number {
-    return this._type;
-  }
-
   get description(): string {
     return this._description;
   }
 
-  get enterprise(): string {
-    return this._enterprise;
-  }
-
-  get installment(): number {
-    return this._installment;
+  get payer(): string {
+    return this._payer;
   }
 
   get amount(): number {
@@ -119,15 +97,15 @@ export default class BillPay {
     return this._dueDate;
   }
 
-  get paymentDate(): Date {
-    return this._paymentDate;
+  get receiveDate(): Date {
+    return this._receiveDate;
   }
 
-  get amountPaid(): number {
-    return this._amountPaid;
+  get amountReceived(): number {
+    return this._amountReceived;
   }
 
-  get pendency(): BillPay | undefined {
+  get pendency(): ReceiveBill | undefined {
     return this._pendency;
   }
 
@@ -135,16 +113,8 @@ export default class BillPay {
     return this._paymentForm;
   }
 
-  get driver(): Driver | undefined {
-    return this._driver;
-  }
-
-  get salesman(): Employee | undefined {
-    return this._salesman;
-  }
-
-  get category(): BillPayCategory | undefined {
-    return this._category;
+  get representation(): Representation | undefined {
+    return this._representation;
   }
 
   get salesOrder(): SalesOrder | undefined {
