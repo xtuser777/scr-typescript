@@ -1,3 +1,5 @@
+import Database from '../util/database';
+
 export default class State {
   private _id: number;
   private _name: string;
@@ -19,5 +21,24 @@ export default class State {
 
   get acronym(): string {
     return this._acronym;
+  }
+
+  async get() {
+    const db = Database.instance as Database;
+    if (await db.open()) {
+      const states: State[] = [];
+      const result = await db.select('select * from estado');
+
+      for (const row of result) {
+        states.push(new State(row.est_id, row.est_nome, row.est_sigla));
+      }
+
+      db.close();
+
+      return states;
+    } else {
+      console.log('Erro devido a falha na conexão com o banco de dados.');
+      return null;
+    }
   }
 }
