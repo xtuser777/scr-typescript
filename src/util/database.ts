@@ -68,7 +68,7 @@ export default class Database {
     }
   }
 
-  async select(sql: string, parameters = []): Promise<any[]> {
+  async select(sql: string, parameters: any[] = []): Promise<any[]> {
     if (this._connection.conn && this._connection.open) {
       // eslint-disable-next-line no-useless-catch
       try {
