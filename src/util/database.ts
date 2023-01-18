@@ -10,6 +10,7 @@ interface IConnection {
 
 export default class Database {
   private static _instance: Database | null = null;
+  private _pool?: mariadb.Pool;
   private _connection: IConnection = { conn: undefined, open: false };
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -24,17 +25,16 @@ export default class Database {
   }
 
   async open(): Promise<boolean> {
-    const pool = mariadb.createPool({
-      host: process.env.DATABASE_HOST,
-      user: process.env.DATABASE_USER,
-      password: process.env.DATABASE_PASSWORD,
-      database: process.env.DATABASE_SCHEMA,
-      charset: process.env.DATABASE_CHARSET,
-      connectionLimit: 5,
-    });
-
     try {
-      this._connection.conn = await pool.getConnection();
+      this._pool = mariadb.createPool({
+        host: process.env.DATABASE_HOST,
+        user: process.env.DATABASE_USER,
+        password: process.env.DATABASE_PASSWORD,
+        database: process.env.DATABASE_SCHEMA,
+        charset: process.env.DATABASE_CHARSET,
+        connectionLimit: 5,
+      });
+      this._connection.conn = await this._pool.getConnection();
       this._connection.open = true;
 
       return true;
@@ -48,6 +48,7 @@ export default class Database {
     if (this._connection.conn && this._connection.open) {
       try {
         await this._connection.conn.end();
+        if (this._pool && !this._pool.closed) await this._pool.end();
         this._connection.open = false;
 
         return true;
@@ -87,6 +88,75 @@ export default class Database {
     } else {
       console.log('Conexão fechada... Tente abrir a conexão com a função open()');
       return [];
+    }
+  }
+
+  async insert(sql: string, parameters: any[]): Promise<number> {
+    if (this._connection.conn && this._connection.open) {
+      // eslint-disable-next-line no-useless-catch
+      try {
+        const result = await this._connection.conn.query(sql, parameters);
+        const insertedId = Number.parseInt(result.insertId);
+
+        return insertedId;
+      } catch (err) {
+        console.error(err);
+        return -1;
+      }
+    } else {
+      console.log('Conexão fechada... Tente abrir a conexão com a função open()');
+      return -5;
+    }
+  }
+
+  async beginTransaction(): Promise<boolean> {
+    if (this._connection.conn && this._connection.open) {
+      // eslint-disable-next-line no-useless-catch
+      try {
+        this._connection.conn.beginTransaction();
+
+        return true;
+      } catch (err) {
+        console.error(err);
+        return false;
+      }
+    } else {
+      console.log('Conexão fechada... Tente abrir a conexão com a função open()');
+      return false;
+    }
+  }
+
+  async commit(): Promise<boolean> {
+    if (this._connection.conn && this._connection.open) {
+      // eslint-disable-next-line no-useless-catch
+      try {
+        this._connection.conn.commit();
+
+        return true;
+      } catch (err) {
+        console.error(err);
+        return false;
+      }
+    } else {
+      console.log('Conexão fechada... Tente abrir a conexão com a função open()');
+      return false;
+    }
+  }
+
+  async rollback(): Promise<boolean> {
+    if (this._connection.conn && this._connection.open) {
+      // eslint-disable-next-line no-useless-catch
+      try {
+        this._connection.conn.rollback();
+
+        return true;
+      } catch (err) {
+        console.error(err);
+        return false;
+      }
+    } else {
+      console.log('Conexão fechada... Tente abrir a conexão com a função open()');
+      return false;
     }
   }
 }

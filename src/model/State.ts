@@ -1,3 +1,4 @@
+import QueryBuilder from '../util/QueryBuilder';
 import Database from '../util/database';
 
 interface Fields {
@@ -35,22 +36,30 @@ export default class State {
       const states: State[] = [];
       const parameters = [];
 
-      let builder = new StateSelectBuilder().select().all().fromState();
+      let builder = new QueryBuilder();
+
+      builder = builder.select('est_id,est_nome,est_sigla').from('estado');
 
       if (fields) {
         if (fields.id) {
           parameters.push(fields.id);
-          builder = builder.where().id().equals('?');
+          builder = builder.where('est_id = ?');
         }
 
         if (fields.name) {
           parameters.push(fields.name);
-          builder = builder.where().and().name().equals('?');
+          builder =
+            parameters.length > 1
+              ? builder.and('est_nome = ?')
+              : builder.where('est_nome = ?');
         }
 
         if (fields.acronym) {
           parameters.push(fields.acronym);
-          builder = builder.where().and().acronym().equals('?');
+          builder =
+            parameters.length > 1
+              ? builder.and('est_sigla = ?')
+              : builder.where('est_sigla = ?');
         }
       }
 
@@ -62,103 +71,12 @@ export default class State {
         states.push(new State(row.est_id, row.est_nome, row.est_sigla));
       }
 
-      db.close();
+      await db.close();
 
       return states;
     } else {
       console.log('Erro devido a falha na conexão com o banco de dados.');
       return null;
     }
-  }
-}
-
-class StateSelectBuilder {
-  private _query: string;
-
-  constructor() {
-    this._query = '';
-
-    return this;
-  }
-
-  select(): this {
-    if (this._query.length > 0) return this;
-    this._query += 'SELECT ';
-
-    return this;
-  }
-
-  all(): this {
-    if (this._query.length > 7) return this;
-    this._query += '*';
-
-    return this;
-  }
-
-  id(): this {
-    if (this._query.length > 0 && this._query.search('WHERE')) this._query += ' ';
-    if (this._query.length > 7 && !this._query.search('WHERE')) this._query += ',';
-    this._query += 'est_id';
-
-    return this;
-  }
-
-  name(): this {
-    if (this._query.length > 7) this._query += ',';
-    this._query += 'est_nome';
-
-    return this;
-  }
-
-  acronym(): this {
-    if (this._query.length > 7) this._query += ',';
-    this._query += 'est_sigla';
-
-    return this;
-  }
-
-  fromState(): this {
-    if (this._query.length <= 7) return this;
-    this._query += ' FROM estado';
-
-    return this;
-  }
-
-  where(): this {
-    if (this._query.substring(this._query.length - 6, this._query.length) !== 'estado')
-      return this;
-
-    this._query += ' WHERE';
-
-    return this;
-  }
-
-  and(): this {
-    if (!this._query.search('WHERE') && !this._query.search('= ?')) return this;
-
-    this._query += ' AND';
-
-    return this;
-  }
-
-  or(): this {
-    if (!this._query.search('WHERE') && !this._query.search('= ?')) return this;
-
-    this._query += ' OR';
-
-    return this;
-  }
-
-  equals(value: string): this {
-    if (!this._query.search('WHERE')) return this;
-    this._query += ' = ' + value;
-
-    return this;
-  }
-
-  build(): string {
-    if (this._query.length <= 7) return '';
-
-    return this._query;
   }
 }
