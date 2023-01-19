@@ -128,39 +128,55 @@ export default class Address {
 
   async save(): Promise<number> {
     const db = Database.instance as Database;
-    if (await db.open()) {
-      let result = 0;
-      const parameters = [
-        this._street,
-        this._number,
-        this._neighborhood,
-        this._complement,
-        this._code,
-        this._city.id,
-      ];
+    let result = 0;
+    const parameters = [
+      this._street,
+      this._number,
+      this._neighborhood,
+      this._complement,
+      this._code,
+      this._city.id,
+    ];
 
-      let builder = new QueryBuilder();
+    const builder = new QueryBuilder();
 
-      builder = builder.insert(
+    const query = builder
+      .insert(
         'endereco',
         'end_rua,end_numero,end_bairro,end_complemento,end_cep,cid_id',
         '?,?,?,?,?,?',
-      );
+      )
+      .build();
 
-      const query = builder.build();
+    result = await db.insert(query, parameters);
 
-      await db.beginTransaction();
+    return result;
+  }
 
-      result = await db.insert(query, parameters);
+  async update(): Promise<number> {
+    const db = Database.instance as Database;
+    let result = 0;
+    const parameters = [
+      this._street,
+      this._number,
+      this._neighborhood,
+      this._complement,
+      this._code,
+      this._city.id,
+      this._id,
+    ];
 
-      await db.commit();
+    const builder = new QueryBuilder();
+    const query = builder
+      .update('endereco')
+      .set(
+        'end_rua = ?,end_numero = ?,end_bairro = ?,end_complemento = ?,end_cep = ?,cid_id = ?',
+      )
+      .where('end_id = ?')
+      .build();
 
-      await db.close();
+    result = await db.update(query, parameters);
 
-      return result;
-    } else {
-      console.log('Erro devido a falha na conexão com o banco de dados.');
-      return -1;
-    }
+    return result;
   }
 }

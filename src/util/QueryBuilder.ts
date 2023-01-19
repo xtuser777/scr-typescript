@@ -21,6 +21,20 @@ export default class QueryBuilder {
     return this;
   }
 
+  update(table: string): this {
+    if (this._query.length > 0) return this;
+    this._query += 'UPDATE ' + table;
+
+    return this;
+  }
+
+  set(columns: string): this {
+    if (!this._query.includes('UPDATE')) return this;
+    this._query += ' SET ' + columns;
+
+    return this;
+  }
+
   from(table: string): this {
     if (this._query.length <= 7) return this;
     this._query += ' FROM ' + table;

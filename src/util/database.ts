@@ -109,6 +109,23 @@ export default class Database {
     }
   }
 
+  async update(sql: string, parameters: any[]): Promise<number> {
+    if (this._connection.conn && this._connection.open) {
+      // eslint-disable-next-line no-useless-catch
+      try {
+        const result = await this._connection.conn.query(sql, parameters);
+
+        return Number.parseInt(result.affectedRows);
+      } catch (err) {
+        console.error(err);
+        return -1;
+      }
+    } else {
+      console.log('Conexão fechada... Tente abrir a conexão com a função open()');
+      return -5;
+    }
+  }
+
   async beginTransaction(): Promise<boolean> {
     if (this._connection.conn && this._connection.open) {
       // eslint-disable-next-line no-useless-catch
