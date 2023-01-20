@@ -1,29 +1,8 @@
 import Address from '../model/Address';
 import City from '../model/City';
-import State from '../model/State';
 import Database from '../util/database';
 
-const state = new State();
-const city = new City();
 const address = new Address();
-
-const showStates = async () => {
-  const states = await state.get({ id: 26 });
-  if (states) {
-    for (const state of states) {
-      console.log(state);
-    }
-  }
-};
-
-const showCities = async () => {
-  const cities = await city.get({ id: 5181 });
-  if (cities) {
-    for (const c of cities) {
-      console.log(c);
-    }
-  }
-};
 
 const showAddresses = async () => {
   const addresses = await address.get();
@@ -59,9 +38,6 @@ const deleteAddress = async () => {
   await Database.instance?.close();
   console.log(result);
 };
-
-//showStates();
-//showCities();
 
 //insertAddress();
 //updateAddress();

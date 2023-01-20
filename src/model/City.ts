@@ -33,61 +33,54 @@ export default class City {
 
   async get(fields?: Fields): Promise<City[] | null> {
     const db = Database.instance as Database;
-    if (await db.open()) {
-      const cities: City[] = [];
-      const parameters = [];
+    const cities: City[] = [];
+    const parameters = [];
 
-      let builder = new QueryBuilder();
+    let builder = new QueryBuilder();
 
-      builder = builder
-        .select('e.est_id,e.est_nome,e.est_sigla,c.cid_id,c.cid_nome')
-        .from('cidade c')
-        .innerJoin('estado e')
-        .on('e.est_id = c.est_id');
+    builder = builder
+      .select('e.est_id,e.est_nome,e.est_sigla,c.cid_id,c.cid_nome')
+      .from('cidade c')
+      .innerJoin('estado e')
+      .on('e.est_id = c.est_id');
 
-      if (fields) {
-        if (fields.id) {
-          parameters.push(fields.id);
-          builder = builder.where('c.cid_id = ?');
-        }
-
-        if (fields.name) {
-          parameters.push(fields.name);
-          builder =
-            parameters.length > 1
-              ? builder.and('c.cid_nome = ?')
-              : builder.where('c.cid_nome = ?');
-        }
-
-        if (fields.state) {
-          parameters.push(fields.state);
-          builder =
-            parameters.length > 1
-              ? builder.and('c.est_id = ?')
-              : builder.where('c.est_id = ?');
-        }
+    if (fields) {
+      if (fields.id) {
+        parameters.push(fields.id);
+        builder = builder.where('c.cid_id = ?');
       }
 
-      const query = builder.build();
-
-      const result = await db.select(query, parameters);
-
-      for (const row of result) {
-        cities.push(
-          new City(
-            row.cid_id,
-            row.cid_nome,
-            new State(row.est_id, row.est_nome, row.est_sigla),
-          ),
-        );
+      if (fields.name) {
+        parameters.push(fields.name);
+        builder =
+          parameters.length > 1
+            ? builder.and('c.cid_nome = ?')
+            : builder.where('c.cid_nome = ?');
       }
 
-      await db.close();
-
-      return cities;
-    } else {
-      console.log('Erro devido a falha na conexão com o banco de dados.');
-      return null;
+      if (fields.state) {
+        parameters.push(fields.state);
+        builder =
+          parameters.length > 1
+            ? builder.and('c.est_id = ?')
+            : builder.where('c.est_id = ?');
+      }
     }
+
+    const query = builder.build();
+
+    const result = await db.select(query, parameters);
+
+    for (const row of result) {
+      cities.push(
+        new City(
+          row.cid_id,
+          row.cid_nome,
+          new State(row.est_id, row.est_nome, row.est_sigla),
+        ),
+      );
+    }
+
+    return cities;
   }
 }
