@@ -1,7 +1,7 @@
-import Address from './model/Address';
-import City from './model/City';
-import State from './model/State';
-import Database from './util/database';
+import Address from '../model/Address';
+import City from '../model/City';
+import State from '../model/State';
+import Database from '../util/database';
 
 const state = new State();
 const city = new City();
@@ -50,9 +50,20 @@ const updateAddress = async () => {
   console.log(result);
 };
 
+const deleteAddress = async () => {
+  await Database.instance?.open();
+  Database.instance?.beginTransaction();
+  const address = new Address(6);
+  const result = await address.delete();
+  await Database.instance?.commit();
+  await Database.instance?.close();
+  console.log(result);
+};
+
 //showStates();
 //showCities();
 
 //insertAddress();
 //updateAddress();
+//deleteAddress();
 showAddresses();

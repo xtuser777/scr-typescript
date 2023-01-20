@@ -32,51 +32,44 @@ export default class State {
 
   async get(fields?: Fields): Promise<State[] | null> {
     const db = Database.instance as Database;
-    if (await db.open()) {
-      const states: State[] = [];
-      const parameters = [];
+    const states: State[] = [];
+    const parameters = [];
 
-      let builder = new QueryBuilder();
+    let builder = new QueryBuilder();
 
-      builder = builder.select('est_id,est_nome,est_sigla').from('estado');
+    builder = builder.select('est_id,est_nome,est_sigla').from('estado');
 
-      if (fields) {
-        if (fields.id) {
-          parameters.push(fields.id);
-          builder = builder.where('est_id = ?');
-        }
-
-        if (fields.name) {
-          parameters.push(fields.name);
-          builder =
-            parameters.length > 1
-              ? builder.and('est_nome = ?')
-              : builder.where('est_nome = ?');
-        }
-
-        if (fields.acronym) {
-          parameters.push(fields.acronym);
-          builder =
-            parameters.length > 1
-              ? builder.and('est_sigla = ?')
-              : builder.where('est_sigla = ?');
-        }
+    if (fields) {
+      if (fields.id) {
+        parameters.push(fields.id);
+        builder = builder.where('est_id = ?');
       }
 
-      const query = builder.build();
-
-      const result = await db.select(query, parameters);
-
-      for (const row of result) {
-        states.push(new State(row.est_id, row.est_nome, row.est_sigla));
+      if (fields.name) {
+        parameters.push(fields.name);
+        builder =
+          parameters.length > 1
+            ? builder.and('est_nome = ?')
+            : builder.where('est_nome = ?');
       }
 
-      await db.close();
-
-      return states;
-    } else {
-      console.log('Erro devido a falha na conexão com o banco de dados.');
-      return null;
+      if (fields.acronym) {
+        parameters.push(fields.acronym);
+        builder =
+          parameters.length > 1
+            ? builder.and('est_sigla = ?')
+            : builder.where('est_sigla = ?');
+      }
     }
+
+    const query = builder.build();
+
+    const result = await db.select(query, parameters);
+
+    for (const row of result) {
+      states.push(new State(row.est_id, row.est_nome, row.est_sigla));
+    }
+
+    return states;
   }
 }

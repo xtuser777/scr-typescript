@@ -35,29 +35,41 @@ export default class QueryBuilder {
     return this;
   }
 
+  delete(table: string): this {
+    if (this._query.length > 0) return this;
+    this._query += 'DELETE FROM ' + table;
+
+    return this;
+  }
+
   from(table: string): this {
-    if (this._query.length <= 7) return this;
+    if (!this._query.includes('SELECT')) return this;
     this._query += ' FROM ' + table;
 
     return this;
   }
 
   innerJoin(table: string): this {
-    if (!this._query.search('FROM')) return this;
+    if (!this._query.includes('FROM')) return this;
     this._query += ' INNER JOIN ' + table;
 
     return this;
   }
 
   on(expression: string): this {
-    if (!this._query.search('FROM')) return this;
+    if (!this._query.includes('JOIN')) return this;
     this._query += ' ON ' + expression;
 
     return this;
   }
 
   where(condition: string): this {
-    if (!this._query.search('FROM')) return this;
+    if (
+      ((this._query.includes('SELECT') || this._query.includes('DELETE')) &&
+        !this._query.includes('FROM')) ||
+      (this._query.includes('UPDATE') && !this._query.includes('SET'))
+    )
+      return this;
     this._query += ' WHERE ' + condition;
 
     return this;

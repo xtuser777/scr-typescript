@@ -179,4 +179,15 @@ export default class Address {
 
     return result;
   }
+
+  async delete(): Promise<number> {
+    const db = Database.instance as Database;
+    let result = 0;
+
+    const query = new QueryBuilder().delete('endereco').where('end_id = ?').build();
+
+    result = await db.delete(query, [this._id]);
+
+    return result;
+  }
 }
