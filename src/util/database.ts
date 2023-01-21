@@ -16,7 +16,7 @@ export default class Database {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   private constructor() {}
 
-  static get instance(): Database | null {
+  static get instance(): Database {
     if (Database._instance === null) {
       Database._instance = new Database();
     }
