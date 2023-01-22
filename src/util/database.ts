@@ -105,7 +105,7 @@ export default class Database {
       }
     } else {
       console.log('Conexão fechada... Tente abrir a conexão com a função open()');
-      return -5;
+      return -1;
     }
   }
 

@@ -34,8 +34,54 @@ const insertContact = async () => {
   );
   await Database.instance.open();
   await Database.instance.beginTransaction();
+
   const result = await contact.save();
-  await Database.instance.commit();
+
+  if (result > 0) await Database.instance.commit();
+  else await Database.instance.rollback();
+
+  await Database.instance.close();
+
+  console.log(result);
+};
+
+const updateContact = async () => {
+  const contact = new Contact(
+    2,
+    '(22) 2222-2222',
+    '(22) 22222-2222',
+    'teste2@email.com',
+    new Address(2),
+  );
+  await Database.instance.open();
+  await Database.instance.beginTransaction();
+
+  const result = await contact.update();
+
+  if (result > 0) await Database.instance.commit();
+  else await Database.instance.rollback();
+
+  await Database.instance.close();
+
+  console.log(result);
+};
+
+const deleteContact = async () => {
+  const contact = new Contact(
+    2,
+    '(22) 2222-2222',
+    '(22) 22222-2222',
+    'teste2@email.com',
+    new Address(2),
+  );
+  await Database.instance.open();
+  await Database.instance.beginTransaction();
+
+  const result = await contact.delete();
+
+  if (result > 0) await Database.instance.commit();
+  else await Database.instance.rollback();
+
   await Database.instance.close();
 
   console.log(result);
