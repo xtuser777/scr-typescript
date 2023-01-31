@@ -27,9 +27,9 @@ const showContactsById = async () => {
 const insertContact = async () => {
   const contact = new Contact(
     0,
-    '(22) 2222-2222',
-    '(22) 22222-2222',
-    'teste@email.com',
+    '(18) 3265-4706',
+    '',
+    'transglobo@hotmail.com',
     new Address(2),
   );
   await Database.instance.open();
@@ -87,4 +87,4 @@ const deleteContact = async () => {
   console.log(result);
 };
 
-showContacts();
+insertContact();

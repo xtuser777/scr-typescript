@@ -5,7 +5,9 @@ import Database from '../util/database';
 const address = new Address();
 
 const showAddresses = async () => {
+  await Database.instance.open();
   const addresses = await address.get();
+  await Database.instance.close();
   if (addresses) {
     for (const address of addresses) {
       console.log(address);
@@ -14,8 +16,22 @@ const showAddresses = async () => {
 };
 
 const insertAddress = async () => {
-  const address = new Address(0, 'teste', 7, 'teste', '', '77.777-000', new City(5181));
+  const address = new Address(
+    0,
+    'Rua Felipe Camarao',
+    840,
+    'Centro',
+    'Sala 2',
+    '19.600-000',
+    new City(5181),
+  );
+  await Database.instance.open();
+  await Database.instance.beginTransaction();
   const result = await address.save();
+  if (result > 0) await Database.instance.commit();
+  else await Database.instance.rollback();
+  await Database.instance.close();
+
   console.log(result);
 };
 
@@ -39,7 +55,7 @@ const deleteAddress = async () => {
   console.log(result);
 };
 
-//insertAddress();
+insertAddress();
 //updateAddress();
 //deleteAddress();
-showAddresses();
+// showAddresses();

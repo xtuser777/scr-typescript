@@ -55,7 +55,13 @@ const deletePerson = async (id: number): Promise<void> => {
 
 showPersons();
 // insertPerson(
-//   new LegalPerson(0, 'Teste 2', 'Teste Testando 2', '22.222.222/0002-02', new Contact(3)),
+//   new LegalPerson(
+//     0,
+//     'GLOBO TRANSPORTES E REPRESENTACOES LTDA',
+//     'Globo Transportes',
+//     '05.519.090/0001-45',
+//     new Contact(2),
+//   ),
 // );
 
 // updatePerson(
