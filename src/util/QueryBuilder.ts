@@ -56,6 +56,13 @@ export default class QueryBuilder {
     return this;
   }
 
+  leftJoin(table: string): this {
+    if (!this._query.includes('FROM')) return this;
+    this._query += ' LEFT JOIN ' + table;
+
+    return this;
+  }
+
   on(expression: string): this {
     if (!this._query.includes('JOIN')) return this;
     this._query += ' ON ' + expression;
@@ -87,6 +94,14 @@ export default class QueryBuilder {
     if (!this._query.search('WHERE') && !this._query.search('= ?')) return this;
 
     this._query += ' OR ' + condition;
+
+    return this;
+  }
+
+  orderBy(column: string): this {
+    if (!this._query.search('SELECT') && !this._query.search('FROM')) return this;
+
+    this._query += ' ORDER BY ' + column;
 
     return this;
   }
