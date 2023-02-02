@@ -102,7 +102,7 @@ export default class Client {
 
     const result = await Database.instance.insert(query, parameters);
 
-    return result > 0 ? id : -10;
+    return result >= 0 ? id : -10;
   }
 
   async get(fields?: IFields): Promise<Client[]> {
@@ -141,7 +141,7 @@ export default class Client {
 
     if (fields) {
       if (fields.id) {
-        parameters.push(this._id);
+        parameters.push(fields.id);
         builder = builder.where('cl.cli_id = ?');
       }
 
@@ -318,7 +318,8 @@ export default class Client {
     if (this._id <= 0) return -5;
 
     let delPerson = 0;
-    if (this._type == 1) delPerson = await this.delPhysicalPerson(this._id);
+    if (this._type == 1)
+      delPerson = await this.delPhysicalPerson(this._id, this._physicalPerson.id);
     else delPerson = await this.delLegalPerson(this._id);
 
     if (delPerson <= 0) return delPerson;
@@ -330,13 +331,14 @@ export default class Client {
     return result;
   }
 
-  async delPhysicalPerson(id: number): Promise<number> {
+  async delPhysicalPerson(clientId: number, personId: number): Promise<number> {
     const query = new QueryBuilder()
       .delete('cliente_pessoa_fisica')
       .where('cli_id = ?')
+      .and('pf_id = ?')
       .build();
 
-    const result = await Database.instance.delete(query, [id]);
+    const result = await Database.instance.delete(query, [clientId, personId]);
 
     return result;
   }

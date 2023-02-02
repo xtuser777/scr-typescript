@@ -27,10 +27,10 @@ const showContactsById = async () => {
 const insertContact = async () => {
   const contact = new Contact(
     0,
-    '(18) 3265-4706',
+    '(11) 1111-1111',
     '',
-    'transglobo@hotmail.com',
-    new Address(2),
+    'teste1@hotmail.com',
+    new Address(3),
   );
   await Database.instance.open();
   await Database.instance.beginTransaction();
@@ -87,4 +87,5 @@ const deleteContact = async () => {
   console.log(result);
 };
 
-insertContact();
+// insertContact();
+showContacts();

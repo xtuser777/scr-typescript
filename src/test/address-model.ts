@@ -18,12 +18,12 @@ const showAddresses = async () => {
 const insertAddress = async () => {
   const address = new Address(
     0,
-    'Rua Felipe Camarao',
-    840,
-    'Centro',
-    'Sala 2',
-    '19.600-000',
-    new City(5181),
+    'Rua Teste 1',
+    111,
+    'Teste',
+    '',
+    '11.100-000',
+    new City(5183),
   );
   await Database.instance.open();
   await Database.instance.beginTransaction();
@@ -55,7 +55,7 @@ const deleteAddress = async () => {
   console.log(result);
 };
 
-insertAddress();
+// insertAddress();
 //updateAddress();
 //deleteAddress();
-// showAddresses();
+showAddresses();

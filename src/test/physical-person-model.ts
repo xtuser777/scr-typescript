@@ -25,7 +25,7 @@ const insertPerson = async (): Promise<void> => {
   const date = new Date(Date.now());
   const person = new PhysicalPerson(
     0,
-    'Teste 2',
+    'Teste 1',
     '11.111.111-2',
     '111.111.111-22',
     date,
@@ -81,4 +81,5 @@ const countCpf = async (): Promise<void> => {
   console.log(count);
 };
 
-countCpf();
+// showPersons();
+// insertPerson();
