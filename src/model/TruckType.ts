@@ -136,4 +136,22 @@ export default class TruckType {
 
     return result;
   }
+
+  async dependents(id: number): Promise<number> {
+    const query = new QueryBuilder()
+      .select('count(tip_cam_id) as dependents')
+      .from('tipo_caminhao tc')
+      .innerJoin('produto_tipo_caminhao ptc')
+      .on('ptc.tip_cam_id = tc.tip_cam_id')
+      .innerJoin('caminhao cam')
+      .on('cam.tip_cam_id = tc.tip_cam_id')
+      .where('tc.tip_cam_id = ?')
+      .build();
+
+    const rows = await Database.instance.select(query, [id]);
+
+    const dependents = rows[0].dependents;
+
+    return dependents;
+  }
 }

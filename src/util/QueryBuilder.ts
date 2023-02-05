@@ -74,7 +74,8 @@ export default class QueryBuilder {
     if (
       ((this._query.includes('SELECT') || this._query.includes('DELETE')) &&
         !this._query.includes('FROM')) ||
-      (this._query.includes('UPDATE') && !this._query.includes('SET'))
+      (this._query.includes('UPDATE') && !this._query.includes('SET')) ||
+      this._query.includes('WHERE')
     )
       return this;
     this._query += ' WHERE ' + condition;
@@ -83,7 +84,7 @@ export default class QueryBuilder {
   }
 
   and(condition: string): this {
-    if (!this._query.search('WHERE') && !this._query.search('= ?')) return this;
+    if (!this._query.includes('WHERE') && !this._query.includes('= ?')) return this;
 
     this._query += ' AND ' + condition;
 
@@ -91,7 +92,7 @@ export default class QueryBuilder {
   }
 
   or(condition: string): this {
-    if (!this._query.search('WHERE') && !this._query.search('= ?')) return this;
+    if (!this._query.includes('WHERE') && !this._query.includes('= ?')) return this;
 
     this._query += ' OR ' + condition;
 
@@ -99,7 +100,7 @@ export default class QueryBuilder {
   }
 
   orderBy(column: string): this {
-    if (!this._query.search('SELECT') && !this._query.search('FROM')) return this;
+    if (!this._query.includes('SELECT') && !this._query.includes('FROM')) return this;
 
     this._query += ' ORDER BY ' + column;
 
