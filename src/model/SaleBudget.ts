@@ -1,7 +1,19 @@
+import Database from '../util/database';
+import QueryBuilder from '../util/QueryBuilder';
 import City from './City';
 import Client from './Client';
 import Employee from './Employee';
 import User from './User';
+
+interface IFields {
+  id?: number;
+  date?: string;
+  initial?: string;
+  end?: string;
+  filter?: string;
+  client?: number;
+  order?: string;
+}
 
 export default class SaleBudget {
   private _id: number;
@@ -32,8 +44,8 @@ export default class SaleBudget {
     weight = 0,
     value = 0,
     validate = new Date(),
-    salesman = undefined,
-    client = undefined,
+    salesman: Employee | undefined = undefined,
+    client: Client | undefined = undefined,
     destiny = new City(),
     author = new User(),
   ) {
@@ -112,5 +124,191 @@ export default class SaleBudget {
 
   get author(): User {
     return this._author;
+  }
+
+  async save(): Promise<number> {
+    if (
+      this._id != 0 ||
+      this._description.length == 0 ||
+      this._clientName.length == 0 ||
+      this.clientDocument.length == 0 ||
+      this._clientPhone.length == 0 ||
+      this._clientCellphone.length == 0 ||
+      this._clientEmail.length == 0 ||
+      this._value <= 0 ||
+      this._weight <= 0 ||
+      this._destiny.id == 0 ||
+      this._author.id == 0
+    )
+      return -5;
+
+    const parameters = [
+      this._description,
+      this._date,
+      this._clientName,
+      this._clientDocument,
+      this._clientPhone,
+      this._clientCellphone,
+      this._clientEmail,
+      this._weight,
+      this._value,
+      this._validate,
+      this._salesman?.id,
+      this._client?.id,
+      this._destiny.id,
+      this._author.id,
+    ];
+
+    const query = new QueryBuilder()
+      .insert(
+        'orcamento_venda',
+        `orc_ven_descricao,orc_ven_data,orc_ven_nome_cliente,orc_ven_documento_cliente,
+        orc_ven_telefone_cliente,orc_ven_celular_cliente,orc_ven_email_cliente,orc_ven_peso,orc_ven_valor,
+        orc_ven_validade,
+        fun_id,cli_id,cid_id,usu_id`,
+        '?,?,?,?,?,?,?,?,?,?,?,?,?,?',
+      )
+      .build();
+
+    const result = await Database.instance.insert(query, parameters);
+
+    return result;
+  }
+
+  async get(fields: IFields): Promise<SaleBudget[]> {
+    const budgets: SaleBudget[] = [];
+    const parameters = [];
+
+    let builder = new QueryBuilder()
+      .select(
+        `orc_ven_id,orc_ven_descricao,orc_ven_data,
+        orc_ven_nome_cliente,orc_ven_documento_cliente,orc_ven_telefone_cliente,orc_ven_celular_cliente,orc_ven_email_cliente,
+        orc_ven_peso,orc_ven_valor,orc_ven_validade,
+        fun_id,cli_id,cid_id,usu_id`,
+      )
+      .from('orcamento_venda');
+
+    if (fields) {
+      if (fields.id) {
+        parameters.push(fields.id);
+        builder = builder.where('orc_ven_id = ?');
+      }
+
+      if (fields.filter) {
+        parameters.push(`%${fields.filter}%`, `%${fields.filter}%`);
+        builder = builder
+          .where('(orc_ven_descricao like ? or orc_ven_nome_cliente like ?)')
+          .and('(orc_ven_descricao like ? or orc_ven_nome_cliente like ?)');
+      }
+
+      if (fields.date) {
+        parameters.push(fields.date);
+        builder = builder.where('orc_ven_data = ?').and('orc_ven_data = ?');
+      }
+
+      if (fields.initial && fields.end) {
+        parameters.push(fields.initial, fields.end);
+        builder = builder
+          .where('(orc_ven_data >= ? and orc_ven_data <= ?)')
+          .and('(orc_ven_data >= ? and orc_ven_data <= ?)');
+      }
+
+      if (fields.client) {
+        parameters.push(fields.client);
+        builder = builder.where('cli_id = ?').and('cli_id = ?');
+      }
+
+      if (fields.order) {
+        builder = builder.orderBy(fields.order);
+      }
+    }
+
+    const query = builder.build();
+
+    const rows = await Database.instance.select(query, parameters);
+
+    for (const row of rows) {
+      budgets.push(
+        new SaleBudget(
+          row.orc_ven_id,
+          row.orc_ven_descricao,
+          row.orc_ven_data,
+          row.orc_ven_nome_cliente,
+          row.orc_ven_documento_cliente,
+          row.orc_ven_telefone_cliente,
+          row.orc_ven_celular_cliente,
+          row.orc_ven_email_cliente,
+          row.orc_ven_peso,
+          row.orc_ven_valor,
+          row.orc_ven_validade,
+          !row.fun_id ? undefined : (await new Employee().get({ id: row.fun_id }))[0],
+          !row.cli_id ? undefined : (await new Client().get({ id: row.cli_id }))[0],
+          (await new City().get({ id: row.cid_id }))[0],
+          (await new User().get({ id: row.usu_id }))[0],
+        ),
+      );
+    }
+
+    return budgets;
+  }
+
+  async update(): Promise<number> {
+    if (
+      this._id <= 0 ||
+      this._description.length == 0 ||
+      this._clientName.length == 0 ||
+      this.clientDocument.length == 0 ||
+      this._clientPhone.length == 0 ||
+      this._clientCellphone.length == 0 ||
+      this._clientEmail.length == 0 ||
+      this._value <= 0 ||
+      this._weight <= 0 ||
+      this._destiny.id == 0
+    )
+      return -5;
+
+    const parameters = [
+      this._description,
+      this._date,
+      this._clientName,
+      this._clientDocument,
+      this._clientPhone,
+      this._clientCellphone,
+      this._clientEmail,
+      this._weight,
+      this._value,
+      this._validate,
+      this._salesman?.id,
+      this._client?.id,
+      this._destiny.id,
+      this._id,
+    ];
+
+    const query = new QueryBuilder()
+      .update('orcamento_venda')
+      .set(
+        `orc_ven_descricao = ?,orc_ven_data = ?,orc_ven_nome_cliente = ?,orc_ven_documento_cliente = ?,
+        orc_ven_telefone_cliente = ?,orc_ven_celular_cliente = ?,orc_ven_email_cliente = ?,orc_ven_peso = ?,
+        orc_ven_valor = ?,orc_ven_validade = ?,fun_id = ?,cli_id = ?,cid_id = ?,usu_id = ?`,
+      )
+      .where('orc_ven_id = ?')
+      .build();
+
+    const result = await Database.instance.update(query, parameters);
+
+    return result;
+  }
+
+  async delete(): Promise<number> {
+    if (this._id <= 0) return -5;
+
+    const query = new QueryBuilder()
+      .delete('orcamento_venda')
+      .where('orc_ven_id = ?')
+      .build();
+
+    const result = await Database.instance.delete(query, [this._id]);
+
+    return result;
   }
 }

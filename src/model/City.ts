@@ -31,7 +31,7 @@ export default class City {
     return this._state;
   }
 
-  async get(fields?: Fields): Promise<City[] | null> {
+  async get(fields?: Fields): Promise<City[]> {
     const db = Database.instance as Database;
     const cities: City[] = [];
     const parameters = [];
