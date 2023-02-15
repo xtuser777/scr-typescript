@@ -36,6 +36,6 @@ const showCitiesByState = async () => {
   }
 };
 
-//showCities();
+// showCities();
 //showCitiesById();
 showCitiesByState();

@@ -38,11 +38,7 @@ export default class City {
 
     let builder = new QueryBuilder();
 
-    builder = builder
-      .select('e.est_id,e.est_nome,e.est_sigla,c.cid_id,c.cid_nome')
-      .from('cidade c')
-      .innerJoin('estado e')
-      .on('e.est_id = c.est_id');
+    builder = builder.select('c.cid_id,c.cid_nome,c.est_id').from('cidade c');
 
     if (fields) {
       if (fields.id) {
@@ -72,15 +68,17 @@ export default class City {
     const result = await db.select(query, parameters);
 
     for (const row of result) {
-      cities.push(
-        new City(
-          row.cid_id,
-          row.cid_nome,
-          new State(row.est_id, row.est_nome, row.est_sigla),
-        ),
-      );
+      const city = new City();
+      await city.convertRow(row);
+      cities.push(city);
     }
 
     return cities;
+  }
+
+  private async convertRow(row: any): Promise<void> {
+    this._id = row.cid_id;
+    this._name = row.cid_nome;
+    this._state = (await new State().get({ id: row.est_id }))[0];
   }
 }

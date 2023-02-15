@@ -30,7 +30,7 @@ export default class State {
     return this._acronym;
   }
 
-  async get(fields?: Fields): Promise<State[] | null> {
+  async get(fields?: Fields): Promise<State[]> {
     const db = Database.instance as Database;
     const states: State[] = [];
     const parameters = [];

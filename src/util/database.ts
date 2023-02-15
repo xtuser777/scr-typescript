@@ -1,7 +1,4 @@
-import dotenv from 'dotenv';
 import mariadb from 'mariadb';
-
-dotenv.config();
 
 interface IConnection {
   conn?: mariadb.Connection;
